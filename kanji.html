@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kanji Learning Tool</title>
+    <style>
+/* General font settings for smooth rendering */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #f5f5f5;
+    -webkit-font-smoothing: antialiased; /* Optimize font smoothing */
+    -moz-osx-font-smoothing: grayscale; /* Better rendering on MacOS */
+    text-rendering: optimizeLegibility; /* Improve text clarity */
+}
+
+/* Kanji Button Styles */
+.kanji-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin-bottom: 30px;
+}
+
+.kanji-button {
+    width: 60px;
+    height: 60px;
+    font-size: 30px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s;
+    position: relative;
+}
+
+.kanji-button:hover {
+    background-color: #45a049;
+    transform: scale(1.1);
+}
+
+/* Tooltip for Kanji */
+.kanji-tooltip {
+    visibility: hidden;
+    width: 200px;
+    background-color: #333;
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    padding: 5px;
+    position: absolute;
+    z-index: 1;
+    bottom: 125%;
+    left: 50%;
+    transform: translateX(-50%);
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.kanji-button:hover .kanji-tooltip {
+    visibility: visible;
+    opacity: 1;
+}
+
+/* Example Table Styles */
+.examples-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    display: none;
+    font-family: 'Noto Serif JP', serif; /* Use Noto Serif for kanji readability */
+    font-size: 18px;
+}
+
+/* Improved kanji clarity */
+.examples-table th,
+.examples-table td {
+    border: 1px solid #ddd;
+    padding: 12px;
+    text-align: left;
+    font-smoothing: antialiased; /* Optimize font smoothing */
+}
+
+.examples-table th {
+    background-color: #4CAF50;
+    color: white;
+    font-weight: 700;
+    font-size: 20px;  /* Slightly larger for better readability */
+}
+
+/* Kanji column styling */
+.examples-table td:nth-child(1) {
+    font-family: 'Noto Serif JP', serif; /* Kanji with Noto Serif JP for clear rendering */
+    font-weight: 900;
+    font-size: 24px;  /* Larger font size for kanji */
+    color: #222;
+    text-shadow: none; /* Remove text-shadow to ensure clear rendering */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+.examples-table td:nth-child(2) {
+    font-family: 'Noto Sans JP', sans-serif;  /* Hiragana with Noto Sans JP for clean readability */
+    font-size: 18px;
+    color: #444;
+    text-transform: capitalize;
+    letter-spacing: 0.5px;
+}
+
+.examples-table td:nth-child(3) {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;  /* English with sans-serif */
+    font-weight: 500;
+    font-size: 17px;
+    color: #333;
+}
+
+.examples-table tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+.examples-table tr:hover {
+    background-color: #ddd;
+}
+
+/* Button styles for active kanji */
+.active {
+    background-color: #2E7D32;
+}
+
+/* Adding spacing to improve table clarity */
+.examples-table th, .examples-table td {
+    padding: 16px 20px;
+}
+
+.examples-table td {
+    text-align: center;
+}
+
+h2 {
+    text-align: center;
+    font-size: 24px;
+    margin-bottom: 15px;
+    font-family: 'Noto Sans JP', sans-serif;
+    color: #333;
+}
+
+/* Responsive adjustments */
+@media (max-width: 600px) {
+    .examples-table th, .examples-table td {
+        padding: 10px 12px;
+        font-size: 16px;
+    }
+
+    .examples-table td:nth-child(1) {
+        font-size: 18px;
+    }
+
+    .examples-table td:nth-child(2) {
+        font-size: 17px;
+    }
+
+    .examples-table td:nth-child(3) {
+        font-size: 16px;
+    }
+
+    .kanji-button {
+        font-size: 25px;
+        width: 50px;
+        height: 50px;
+    }
+}
+
+
+</style>
+</head>
+<body>
+    <h1>Kanji Learning Tool</h1>
+    
+    <div class="kanji-container" id="kanjiContainer">
+        <!-- Kanji buttons will be added here from kanjiData.js -->
+    </div>
+    
+    <div id="examplesDisplay">
+        <!-- Example tables will be shown here when a kanji is clicked -->
+    </div>
+    
+    <!-- Include the kanji data script -->
+    <script src="kanjiData.js"></script>
+    
+    <!-- Main application script -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize with data from kanjiData.js
+            kanjiData.forEach(kanji => {
+                addKanjiButton(kanji);
+            });
+            
+            function addKanjiButton(kanjiData) {
+                const kanjiContainer = document.getElementById('kanjiContainer');
+                
+                const button = document.createElement('button');
+                button.className = 'kanji-button';
+                button.textContent = kanjiData.character;
+                button.dataset.meaning = kanjiData.meaning;
+                button.dataset.examples = JSON.stringify(kanjiData.examples);
+                
+                // Create tooltip
+                const tooltip = document.createElement('span');
+                tooltip.className = 'kanji-tooltip';
+                tooltip.textContent = kanjiData.meaning;
+                button.appendChild(tooltip);
+                
+                // Add click event
+                button.addEventListener('click', function() {
+                    // Remove active class from all buttons
+                    document.querySelectorAll('.kanji-button').forEach(btn => {
+                        btn.classList.remove('active');
+                    });
+                    
+                    // Add active class to clicked button
+                    this.classList.add('active');
+                    
+                    // Display examples
+                    displayExamples(kanjiData);
+                });
+                
+                kanjiContainer.appendChild(button);
+            }
+            
+            function displayExamples(kanjiData) {
+                const examplesDisplay = document.getElementById('examplesDisplay');
+                
+                // Create table
+                let tableHTML = `
+                    <h2>Examples for ${kanjiData.character} (${kanjiData.meaning})</h2>
+                    <table class="examples-table">
+                        <thead>
+                            <tr>
+                                <th>Kanji</th>
+                                <th>Hiragana</th>
+                                <th>English Meaning</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                `;
+                
+                kanjiData.examples.forEach(example => {
+                    tableHTML += `
+                        <tr>
+                            <td>${example.kanji}</td>
+                            <td>${example.hiragana}</td>
+                            <td>${example.english}</td>
+                        </tr>
+                    `;
+                });
+                
+                tableHTML += `
+                        </tbody>
+                    </table>
+                `;
+                
+                examplesDisplay.innerHTML = tableHTML;
+                
+                // Show the table
+                document.querySelector('.examples-table').style.display = 'table';
+            }
+        });
+    </script>
+</body>
+</html>
